@@ -1,7 +1,7 @@
 [project]
 name = "codex-agent"
 version = "0.1.0"
-description = "Reusable Codex-backed LLM core for agents and workflows."
+description = "Thin Python adapter for using local Codex as a pluggable LLM."
 requires-python = ">=3.10"
 dependencies = []
 
