@@ -22,6 +22,8 @@ class CodexExecConfig:
     extra_config: tuple[str, ...] = ()
     ephemeral: bool = False
     skip_git_repo_check: bool = False
+    prompt_via_stdin: bool = False
+    timeout_seconds: float | None = None
 
 
 @dataclass(frozen=True)
@@ -63,7 +65,7 @@ def build_exec_command(config: CodexExecConfig, prompt: str) -> list[str]:
         cmd.append("--skip-git-repo-check")
     for item in config.extra_config:
         cmd.extend(["--config", item])
-    cmd.append(prompt)
+    cmd.append("-" if config.prompt_via_stdin else prompt)
     return cmd
 
 
@@ -85,13 +87,40 @@ def _run_codex_exec(
     prompt: str,
     output_last_message: Path,
 ) -> CodexExecResult:
-    proc = subprocess.run(
-        build_exec_command(config, prompt),
-        stdin=subprocess.DEVNULL,
-        text=True,
-        capture_output=True,
-        check=False,
-    )
+    try:
+        if config.prompt_via_stdin:
+            proc = subprocess.run(
+                build_exec_command(config, prompt),
+                input=prompt,
+                text=True,
+                capture_output=True,
+                check=False,
+                timeout=config.timeout_seconds,
+            )
+        else:
+            proc = subprocess.run(
+                build_exec_command(config, prompt),
+                stdin=subprocess.DEVNULL,
+                text=True,
+                capture_output=True,
+                check=False,
+                timeout=config.timeout_seconds,
+            )
+    except subprocess.TimeoutExpired as exc:
+        stdout = exc.stdout or ""
+        stderr = exc.stderr or ""
+        if isinstance(stdout, bytes):
+            stdout = stdout.decode(errors="replace")
+        if isinstance(stderr, bytes):
+            stderr = stderr.decode(errors="replace")
+        message = f"codex exec timed out after {config.timeout_seconds}s"
+        return CodexExecResult(
+            returncode=124,
+            events=parse_jsonl_events(stdout),
+            stdout=stdout,
+            stderr=(stderr + "\n" + message).strip(),
+            last_message=None,
+        )
     events = parse_jsonl_events(proc.stdout)
     last_message = _read_last_message(output_last_message) or _last_message(events)
     return CodexExecResult(

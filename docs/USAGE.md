@@ -7,6 +7,10 @@ The key rule: workflow code should depend on `LanguageModel`, not on subprocess
 or Codex CLI details. That makes workflows easy to test and keeps Codex as one
 pluggable implementation.
 
+Real `CodexLLM` calls use the caller's local Codex CLI authentication. Keep
+automated tests on fake models unless you intentionally want an integration run
+that exercises local Codex access.
+
 ## Main Concepts
 
 `LanguageModel` is the generic protocol:
@@ -69,6 +73,8 @@ Common fields:
 - `extra_config`: tuple of repeated `--config` values.
 - `ephemeral`: adds `--ephemeral`.
 - `skip_git_repo_check`: adds `--skip-git-repo-check`.
+- `prompt_via_stdin`: sends the prompt through stdin and passes `-` to Codex.
+- `timeout_seconds`: optional subprocess timeout for real Codex calls.
 
 ## Generic Skill Runner
 

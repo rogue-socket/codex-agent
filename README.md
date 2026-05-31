@@ -8,6 +8,10 @@ code can depend on `LanguageModel` instead of subprocess details. That keeps
 workflow code easy to test with fake models while still allowing production
 wiring to call local Codex.
 
+It is useful when you want a product, prototype, or internal test harness to use
+your authenticated local Codex setup without hard-coding Codex CLI subprocess
+calls throughout the application.
+
 ## What This Is
 
 - A thin Python adapter around local `codex exec --json`.
@@ -40,9 +44,18 @@ From this repository:
 python3 -m pip install -e .
 ```
 
+For local development and tests:
+
+```bash
+python3 -m pip install -e ".[dev]"
+python3 -m pytest tests
+```
+
 Runtime dependencies: none beyond the Python standard library.
 
-For real Codex calls, you also need the Codex CLI available on `PATH`.
+For real Codex calls, you also need the Codex CLI available on `PATH` and
+authenticated locally. Unit tests should keep using fakes or monkeypatching so
+they do not consume local Codex access.
 
 ## Quick Start
 
@@ -54,6 +67,7 @@ model = CodexLLM(
         model="gpt-5.5",
         sandbox="workspace-write",
         skip_git_repo_check=True,
+        timeout_seconds=120,
     )
 )
 
@@ -139,3 +153,7 @@ python3 -m compileall -q codex_agent tests
 
 See [docs/USAGE.md](docs/USAGE.md) for a fuller integration guide with workflow
 examples.
+
+## License
+
+MIT. See [LICENSE](LICENSE).

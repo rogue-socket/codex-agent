@@ -2,12 +2,34 @@
 name = "codex-agent"
 version = "0.1.0"
 description = "Thin Python adapter for using local Codex as a pluggable LLM."
+readme = "README.md"
+license = "MIT"
 requires-python = ">=3.10"
 dependencies = []
+keywords = ["agents", "codex", "llm", "openai", "testing"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[project.urls]
+Homepage = "https://github.com/rogue-socket/codex-agent"
+Repository = "https://github.com/rogue-socket/codex-agent"
+Issues = "https://github.com/rogue-socket/codex-agent/issues"
 
 [build-system]
 requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["codex_agent*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
