@@ -153,3 +153,7 @@ python3 -m compileall -q codex_agent tests
 
 See [docs/USAGE.md](docs/USAGE.md) for a fuller integration guide with workflow
 examples.
+
+## License
+
+MIT. See [LICENSE](LICENSE).
